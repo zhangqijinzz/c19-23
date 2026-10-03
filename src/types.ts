@@ -31,6 +31,28 @@ export interface LayoutDocument {
   elements: ExpoElement[];
 }
 
+export interface HistorySnapshot {
+  document: LayoutDocument;
+  selectedId: string | null;
+}
+
+export interface HistoryEntry {
+  id: string;
+  label: string;
+  at: number;
+  snapshot: HistorySnapshot;
+}
+
+export interface HistoryView {
+  entries: HistoryEntry[];
+  currentIndex: number;
+}
+
+export interface SessionRecord {
+  version: 2;
+  history: HistoryView;
+}
+
 export interface ElementSpec {
   kind: ElementKind;
   label: string;
