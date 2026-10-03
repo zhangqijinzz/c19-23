@@ -31,6 +31,25 @@ export interface LayoutDocument {
   elements: ExpoElement[];
 }
 
+export interface HistoryEntry {
+  id: string;
+  label: string;
+  at: number;
+  document: LayoutDocument;
+  selectedId: string | null;
+}
+
+export interface HistoryStack {
+  entries: HistoryEntry[];
+  index: number;
+}
+
+export interface PersistedLayout {
+  version: 2;
+  document: LayoutDocument;
+  history: HistoryStack | null;
+}
+
 export interface ElementSpec {
   kind: ElementKind;
   label: string;

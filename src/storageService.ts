@@ -1,8 +1,6 @@
-import type { LayoutDocument } from './types';
-
 export interface DocumentStorageService {
-  read(): Promise<LayoutDocument | null>;
-  write(document: LayoutDocument): Promise<void>;
+  read(): Promise<unknown>;
+  write(payload: unknown): Promise<void>;
 }
 
 const STORAGE_KEY = 'exposketch.document.v1';
@@ -10,25 +8,25 @@ const STORAGE_KEY = 'exposketch.document.v1';
 const canUseIndexedDb = () => typeof indexedDB !== 'undefined';
 
 export class BrowserStorageService implements DocumentStorageService {
-  async read(): Promise<LayoutDocument | null> {
+  async read(): Promise<unknown> {
     if (!canUseIndexedDb()) {
       const raw = window.localStorage.getItem(STORAGE_KEY);
-      return raw ? (JSON.parse(raw) as LayoutDocument) : null;
+      return raw ? (JSON.parse(raw) as unknown) : null;
     }
-    return this.withDatabase((store) => new Promise<LayoutDocument | null>((resolve, reject) => {
+    return this.withDatabase((store) => new Promise<unknown>((resolve, reject) => {
       const request = store.get(STORAGE_KEY);
-      request.onsuccess = () => resolve((request.result as LayoutDocument | undefined) ?? null);
+      request.onsuccess = () => resolve((request.result as unknown) ?? null);
       request.onerror = () => reject(request.error ?? new Error('读取布局失败'));
     }));
   }
 
-  async write(document: LayoutDocument): Promise<void> {
+  async write(payload: unknown): Promise<void> {
     if (!canUseIndexedDb()) {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(document));
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
       return;
     }
     await this.withDatabase((store) => new Promise<void>((resolve, reject) => {
-      const request = store.put(document, STORAGE_KEY);
+      const request = store.put(payload, STORAGE_KEY);
       request.onsuccess = () => resolve();
       request.onerror = () => reject(request.error ?? new Error('保存布局失败'));
     }));

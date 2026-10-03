@@ -5,8 +5,8 @@ import type { LayoutDocument } from '../src/types';
 import { ExpoSketchViewModel } from '../src/viewModel';
 
 const fakeRepository = (initial: LayoutDocument | null = null): LayoutRepository => ({
-  load: vi.fn(async () => initial ?? createStarterDocument()),
-  save: vi.fn(async (_document) => {}),
+  load: vi.fn(async () => ({ version: 2 as const, document: initial ?? createStarterDocument(), history: null })),
+  save: vi.fn(async (_document, _history) => {}),
 });
 
 describe('ExpoSketchViewModel', () => {
@@ -33,10 +33,11 @@ describe('ExpoSketchViewModel', () => {
     await vm.initialize();
     expect(vm.state.phase).toBe('error');
     expect(vm.state.document.title).toContain('春日创意市集');
+    expect(vm.state.history.entries).toHaveLength(1);
   });
 
   it('shows a save error without dropping the working document', async () => {
-    const repository: LayoutRepository = { load: vi.fn(async () => createStarterDocument()), save: vi.fn(async () => { throw new Error('quota'); }) };
+    const repository: LayoutRepository = { load: vi.fn(async () => ({ version: 2 as const, document: createStarterDocument(), history: null })), save: vi.fn(async () => { throw new Error('quota'); }) };
     const vm = new ExpoSketchViewModel(repository);
     await vm.initialize();
     vm.addElement('stage');
